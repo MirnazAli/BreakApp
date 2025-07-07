@@ -1,0 +1,49 @@
+{
+  "name": "break_app",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "nodemon --exec electron .",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["productivity", "break", "reminder", "islam", "prayer", "rain", "kittens"],
+  "author": "Mirnaz Ali",
+  "license": "ISC",
+  "description": "A cute but invasive break reminder application",
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "electron-store": "^10.1.0",
+    "node-schedule": "^2.1.1"
+  },
+  "build": {
+    "appId": "com.mino.break-app",
+    "productName": "Break App",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
