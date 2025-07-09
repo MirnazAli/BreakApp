@@ -1,0 +1,170 @@
+/* src/renderer/overlay.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+}
+
+#overlay-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#rain-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#kitten-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.kitten {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="%23ff9800"/><circle cx="40" cy="45" r="3" fill="%23333"/><circle cx="60" cy="45" r="3" fill="%23333"/><path d="M35 30 L40 20 L45 30 Z" fill="%23ff9800"/><path d="M55 30 L60 20 L65 30 Z" fill="%23ff9800"/><path d="M45 55 Q50 60 55 55" stroke="%23333" stroke-width="2" fill="none"/></svg>') no-repeat center;
+    background-size: contain;
+    animation: kittenFall 3s ease-in forwards;
+    z-index: 2;
+}
+
+@keyframes kittenFall {
+    from {
+        transform: translateY(-100px) rotate(0deg);
+    }
+    to {
+        transform: translateY(calc(100vh - 60px)) rotate(360deg);
+    }
+}
+
+.kitten:nth-child(even) {
+    animation-duration: 2.5s;
+}
+
+.kitten:nth-child(3n) {
+    animation-duration: 3.5s;
+}
+
+#break-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+#break-message h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #333;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+#break-message p {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+#break-timer {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #667eea;
+    margin: 20px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+#end-break-btn {
+    padding: 12px 24px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+}
+
+#end-break-btn:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Rain drop animation */
+.rain-drop {
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent, rgba(174, 194, 224, 0.8), transparent);
+    animation: rainFall linear infinite;
+}
+
+@keyframes rainFall {
+    from {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    to {
+        transform: translateY(calc(100vh + 100px));
+        opacity: 0;
+    }
+}
+
+/* Blur effect that increases over time */
+.blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(0px);
+    animation: increaseBlur 30s linear forwards;
+    z-index: 0;
+}
+
+@keyframes increaseBlur {
+    from {
+        backdrop-filter: blur(0px);
+    }
+    to {
+        backdrop-filter: blur(10px);
+    }
+}

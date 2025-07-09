@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitten Break App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐱 Kitten Break App</h1>
+            <p>Stay productive with adorable interruptions</p>
+        </header>
+
+        <main>
+            <section class="timer-section">
+                <h2>Break Timer</h2>
+                <div class="timer-display">
+                    <span id="next-break">Next break in: <span id="countdown">25:00</span></span>
+                </div>
+                <button id="break-now-btn" class="btn primary">Take Break Now</button>
+            </section>
+
+            <section class="settings-section">
+                <h2>Settings</h2>
+                
+                <div class="setting-group">
+                    <label for="break-interval">Break Interval (minutes):</label>
+                    <input type="number" id="break-interval" min="1" max="120" value="25">
+                </div>
+
+                <div class="setting-group">
+                    <label for="break-duration">Break Duration (minutes):</label>
+                    <input type="number" id="break-duration" min="1" max="30" value="5">
+                </div>
+
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="enable-rain" checked>
+                        Enable Rain Animation
+                    </label>
+                </div>
+
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="enable-kittens" checked>
+                        Enable Kitten Spawning
+                    </label>
+                </div>
+
+                <button id="save-settings-btn" class="btn secondary">Save Settings</button>
+            </section>
+
+            <section class="preview-section">
+                <h2>Preview</h2>
+                <button id="preview-rain-btn" class="btn outline">Preview Rain</button>
+                <button id="preview-kittens-btn" class="btn outline">Preview Kittens</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>Made with ❤️ for productivity</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

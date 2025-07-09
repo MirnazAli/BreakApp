@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Break Time</title>
+    <link rel="stylesheet" href="overlay.css">
+</head>
+<body>
+    <div id="overlay-container">
+        <!-- Rain animation canvas -->
+        <canvas id="rain-canvas"></canvas>
+        
+        <!-- Kitten container -->
+        <div id="kitten-container"></div>
+        
+        <!-- Break message -->
+        <div id="break-message">
+            <h1>🐱 Break Time! 🐱</h1>
+            <p>Take a moment to rest your eyes and stretch</p>
+            <div id="break-timer">5:00</div>
+            <button id="end-break-btn" class="btn">End Break Early</button>
+        </div>
+    </div>
+
+    <script src="animations/rain.js"></script>
+    <script src="animations/kittens.js"></script>
+    <script src="overlay.js"></script>
+</body>
+</html>

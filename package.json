@@ -11,7 +11,15 @@
     "build-linux": "electron-builder --linux",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["productivity", "break", "reminder", "islam", "prayer", "rain", "kittens"],
+  "keywords": [
+    "productivity",
+    "break",
+    "reminder",
+    "islam",
+    "prayer",
+    "rain",
+    "kittens"
+  ],
   "author": "Mirnaz Ali",
   "license": "ISC",
   "description": "A cute but invasive break reminder application",
