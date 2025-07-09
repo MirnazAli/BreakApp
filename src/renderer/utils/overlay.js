@@ -6,11 +6,20 @@ class BreakOverlay {
         this.breakInterval = null;
         this.rainAnimation = null;
         this.kittenAnimation = null;
+        this.debug = true;
         
         this.init();
     }
     
+    log(message, data = null) {
+        if (this.debug) {
+            console.log('[BreakOverlay]', message, data);
+        }
+    }
+    
     async init() {
+        this.log('Initializing overlay...');
+        
         // Load configuration
         await this.loadConfig();
         
@@ -25,13 +34,22 @@ class BreakOverlay {
         
         // Start break
         this.startBreak();
+        
+        this.log('Overlay initialized successfully');
     }
     
     async loadConfig() {
+        this.log('Loading config...');
+        
         try {
-            this.config = await window.electronAPI.getConfig();
+            if (window.electronAPI && window.electronAPI.getConfig) {
+                this.config = await window.electronAPI.getConfig();
+                this.log('Config loaded:', this.config);
+            } else {
+                throw new Error('electronAPI not available');
+            }
         } catch (error) {
-            console.error('Error loading config:', error);
+            this.log('Error loading config, using defaults:', error);
             this.config = {
                 breakDuration: 5,
                 enableKittens: true,
@@ -41,41 +59,69 @@ class BreakOverlay {
     }
     
     setupAnimations() {
+        this.log('Setting up animations...');
+        
         // Initialize rain animation
         const rainCanvas = document.getElementById('rain-canvas');
-        this.rainAnimation = new RainAnimation(rainCanvas);
+        if (rainCanvas && window.RainAnimation) {
+            this.rainAnimation = new RainAnimation(rainCanvas);
+        } else {
+            this.log('Rain animation not available');
+        }
         
         // Initialize kitten animation
         const kittenContainer = document.getElementById('kitten-container');
-        this.kittenAnimation = new KittenAnimation(kittenContainer);
+        if (kittenContainer && window.KittenAnimation) {
+            this.kittenAnimation = new KittenAnimation(kittenContainer);
+        } else {
+            this.log('Kitten animation not available');
+        }
     }
     
     setupBreakTimer() {
+        this.log('Setting up break timer for', this.config.breakDuration, 'minutes');
+        
         this.breakTimer = this.config.breakDuration * 60; // Convert to seconds
         this.updateTimerDisplay();
     }
     
     setupEventListeners() {
-        // End break button
-        document.getElementById('end-break-btn').addEventListener('click', () => {
-            this.endBreak();
-        });
+        this.log('Setting up event listeners...');
         
-        // Keyboard shortcuts
+        // End break button
+        const endBreakBtn = document.getElementById('end-break-btn');
+        if (endBreakBtn) {
+            endBreakBtn.addEventListener('click', () => {
+                this.log('End break button clicked');
+                this.endBreak();
+            });
+        }
+        
+        // ESC key functionality
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                this.log('ESC key pressed');
                 this.endBreak();
             }
+        });
+        
+        // Prevent context menu
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
         });
     }
     
     startBreak() {
+        this.log('Starting break...');
+        
         // Start animations if enabled
-        if (this.config.enableRain) {
+        if (this.config.enableRain && this.rainAnimation) {
+            this.log('Starting rain animation');
             this.rainAnimation.start();
         }
         
-        if (this.config.enableKittens) {
+        if (this.config.enableKittens && this.kittenAnimation) {
+            this.log('Starting kitten animation');
             this.kittenAnimation.start();
         }
         
@@ -84,7 +130,10 @@ class BreakOverlay {
             this.breakTimer--;
             this.updateTimerDisplay();
             
+            this.log('Timer tick:', this.breakTimer);
+            
             if (this.breakTimer <= 0) {
+                this.log('Timer reached zero, ending break');
                 this.endBreak();
             }
         }, 1000);
@@ -94,10 +143,18 @@ class BreakOverlay {
         const minutes = Math.floor(this.breakTimer / 60);
         const seconds = this.breakTimer % 60;
         const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        document.getElementById('break-timer').textContent = display;
+        
+        const timerElement = document.getElementById('break-timer');
+        if (timerElement) {
+            timerElement.textContent = display;
+        } else {
+            this.log('Timer element not found');
+        }
     }
     
     async endBreak() {
+        this.log('Ending break...');
+        
         // Stop animations
         if (this.rainAnimation) {
             this.rainAnimation.stop();
@@ -110,18 +167,32 @@ class BreakOverlay {
         // Clear timer
         if (this.breakInterval) {
             clearInterval(this.breakInterval);
+            this.breakInterval = null;
         }
         
         // Notify main process
         try {
-            await window.electronAPI.endBreak();
+            if (window.electronAPI && window.electronAPI.endBreak) {
+                await window.electronAPI.endBreak();
+                this.log('Break ended successfully');
+            } else {
+                this.log('electronAPI.endBreak not available');
+            }
         } catch (error) {
-            console.error('Error ending break:', error);
+            this.log('Error ending break:', error);
         }
     }
 }
 
 // Initialize overlay when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing BreakOverlay...');
     new BreakOverlay();
+});
+
+// Debug: Check if required globals are available
+console.log('Available globals:', {
+    electronAPI: !!window.electronAPI,
+    RainAnimation: !!window.RainAnimation,
+    KittenAnimation: !!window.KittenAnimation
 });
