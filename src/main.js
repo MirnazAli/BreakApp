@@ -65,8 +65,9 @@ function createMainWindow() {
 
 function createOverlayWindow() {
     const displays = screen.getAllDisplays();
+    const overlays = [];
     
-    displays.forEach((display, index) => {
+    displays.forEach((display) => {
         const overlay = new BrowserWindow({
             x: display.bounds.x,
             y: display.bounds.y,
@@ -87,12 +88,12 @@ function createOverlayWindow() {
 
         overlay.loadFile(path.join(__dirname, 'renderer/overlay.html'));
         overlay.setIgnoreMouseEvents(false);
-        
-        if (index === 0) {
-            overlayWindow = overlay;
-        }
+        overlays.push(overlay);
     });
+    
+    overlayWindow = overlays; // Store array of overlays
 }
+
 
 function startBreakMode() {
     console.log('Starting break mode...');
@@ -107,7 +108,11 @@ function startBreakMode() {
 function endBreakMode() {
     console.log('Ending break mode...');
     if (overlayWindow) {
-        overlayWindow.close();
+        if (Array.isArray(overlayWindow)) {
+            overlayWindow.forEach(window => window.close());
+        } else {
+            overlayWindow.close();
+        }
         overlayWindow = null;
     }
     scheduleNextBreak();
