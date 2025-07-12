@@ -9,6 +9,7 @@ let mainWindow = null;
 let overlayWindows = [];
 let tray = null;
 let breakTimer = null;
+let breakEndTimer = null;
 
 // App configuration
 const config = {
@@ -99,6 +100,12 @@ function createMainWindow() {
 function createOverlayWindow() {
     console.log('Creating overlay window...');
     
+    // Clear any existing break end timer
+    if (breakEndTimer) {
+        clearTimeout(breakEndTimer);
+        breakEndTimer = null;
+    }
+    
     const displays = screen.getAllDisplays();
     overlayWindows = [];
     
@@ -139,34 +146,67 @@ function createOverlayWindow() {
             console.error(`Overlay ${index} failed to load:`, errorCode, errorDescription);
         });
         
+        // Handle overlay close
+        overlay.on('closed', () => {
+            console.log(`Overlay ${index} closed`);
+            // Remove from array
+            const windowIndex = overlayWindows.indexOf(overlay);
+            if (windowIndex > -1) {
+                overlayWindows.splice(windowIndex, 1);
+            }
+        });
+        
         overlay.setIgnoreMouseEvents(false);
         overlayWindows.push(overlay);
     });
+    
+    // Set up automatic break end timer
+    const breakDuration = config.breakDuration * 60 * 1000;
+    console.log(`Break will end automatically in ${config.breakDuration} minutes`);
+    
+    breakEndTimer = setTimeout(() => {
+        console.log('Automatic break end timer triggered');
+        endBreakMode();
+    }, breakDuration);
 }
 
 function startBreakMode() {
     console.log('Starting break mode...');
-    createOverlayWindow();
     
-    // Schedule break end
-    const breakDuration = config.breakDuration * 60 * 1000;
-    console.log(`Break will end in ${config.breakDuration} minutes`);
-    
-    setTimeout(() => {
+    // End any existing break first
+    if (overlayWindows.length > 0) {
+        console.log('Ending existing break before starting new one');
         endBreakMode();
-    }, breakDuration);
+    }
+    
+    createOverlayWindow();
 }
 
 function endBreakMode() {
     console.log('Ending break mode...');
     
-    overlayWindows.forEach(window => {
-        if (window && !window.isDestroyed()) {
-            window.close();
-        }
-    });
+    // Clear break end timer
+    if (breakEndTimer) {
+        clearTimeout(breakEndTimer);
+        breakEndTimer = null;
+    }
+    
+    // Close all overlay windows
+    const windowsToClose = [...overlayWindows]; // Create a copy to avoid modification during iteration
     overlayWindows = [];
     
+    windowsToClose.forEach((window, index) => {
+        if (window && !window.isDestroyed()) {
+            console.log(`Closing overlay window ${index}`);
+            try {
+                window.close();
+            } catch (error) {
+                console.error(`Error closing overlay window ${index}:`, error);
+            }
+        }
+    });
+    
+    console.log('All overlay windows closed, scheduling next break');
     scheduleNextBreak();
 }
 
@@ -220,6 +260,17 @@ app.on('before-quit', () => {
     if (breakTimer) {
         clearTimeout(breakTimer);
     }
+    
+    if (breakEndTimer) {
+        clearTimeout(breakEndTimer);
+    }
+    
+    // Close all overlay windows
+    overlayWindows.forEach(window => {
+        if (window && !window.isDestroyed()) {
+            window.close();
+        }
+    });
 });
 
 // IPC handlers for communication with renderer
@@ -252,11 +303,13 @@ ipcMain.handle('update-config', (event, newConfig) => {
 ipcMain.handle('trigger-break', () => {
     console.log('Break triggered from renderer');
     startBreakMode();
+    return true;
 });
 
 ipcMain.handle('end-break', () => {
-    console.log('Break ended from renderer');
+    console.log('Break end requested from renderer');
     endBreakMode();
+    return true;
 });
 
 // Add debugging IPC

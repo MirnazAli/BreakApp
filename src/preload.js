@@ -11,6 +11,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     triggerBreak: () => ipcRenderer.invoke('trigger-break'),
     endBreak: () => ipcRenderer.invoke('end-break'),
     
+    // Debug methods
+    debugLog: (message) => ipcRenderer.invoke('debug-log', message),
+    
     // Utility methods
     platform: process.platform,
     

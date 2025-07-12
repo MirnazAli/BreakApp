@@ -7,6 +7,7 @@ class BreakOverlay {
         this.rainAnimation = null;
         this.kittenAnimation = null;
         this.debug = true;
+        this.blurOverlay = null;
         
         this.init();
     }
@@ -23,6 +24,9 @@ class BreakOverlay {
         // Load configuration
         await this.loadConfig();
         
+        // Set up blur overlay
+        this.setupBlurOverlay();
+        
         // Set up animations
         this.setupAnimations();
         
@@ -36,6 +40,20 @@ class BreakOverlay {
         this.startBreak();
         
         this.log('Overlay initialized successfully');
+    }
+    
+    setupBlurOverlay() {
+        this.log('Setting up progressive blur overlay...');
+        
+        // Create progressive blur overlay
+        this.blurOverlay = document.createElement('div');
+        this.blurOverlay.className = 'progressive-blur';
+        
+        // Insert it right after the overlay container
+        const container = document.getElementById('overlay-container');
+        if (container) {
+            container.appendChild(this.blurOverlay);
+        }
     }
     
     async loadConfig() {
@@ -91,7 +109,9 @@ class BreakOverlay {
         // End break button
         const endBreakBtn = document.getElementById('end-break-btn');
         if (endBreakBtn) {
-            endBreakBtn.addEventListener('click', () => {
+            endBreakBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 this.log('End break button clicked');
                 this.endBreak();
             });
@@ -100,6 +120,8 @@ class BreakOverlay {
         // ESC key functionality
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
                 this.log('ESC key pressed');
                 this.endBreak();
             }
@@ -125,6 +147,9 @@ class BreakOverlay {
             this.kittenAnimation.start();
         }
         
+        // Start progressive blur effect
+        this.startProgressiveBlur();
+        
         // Start countdown
         this.breakInterval = setInterval(() => {
             this.breakTimer--;
@@ -137,6 +162,29 @@ class BreakOverlay {
                 this.endBreak();
             }
         }, 1000);
+    }
+    
+    startProgressiveBlur() {
+        this.log('Starting progressive blur effect...');
+        
+        const overlayContainer = document.getElementById('overlay-container');
+        if (overlayContainer) {
+            let blurIntensity = 0;
+            const maxBlur = 3;
+            const blurIncrement = maxBlur / (this.config.breakDuration * 60); // Spread over break duration
+            
+            const blurInterval = setInterval(() => {
+                if (blurIntensity < maxBlur) {
+                    blurIntensity += blurIncrement;
+                    overlayContainer.style.backdropFilter = `blur(${blurIntensity}px)`;
+                } else {
+                    clearInterval(blurInterval);
+                }
+            }, 1000);
+            
+            // Store interval for cleanup
+            this.blurInterval = blurInterval;
+        }
     }
     
     updateTimerDisplay() {
@@ -155,32 +203,54 @@ class BreakOverlay {
     async endBreak() {
         this.log('Ending break...');
         
-        // Stop animations
+        // Prevent multiple calls
+        if (this.isEnding) {
+            this.log('Already ending break, ignoring...');
+            return;
+        }
+        this.isEnding = true;
+        
+        // Stop animations immediately
         if (this.rainAnimation) {
+            this.log('Stopping rain animation');
             this.rainAnimation.stop();
         }
         
         if (this.kittenAnimation) {
+            this.log('Stopping kitten animation');
             this.kittenAnimation.stop();
         }
         
-        // Clear timer
+        // Clear timers
         if (this.breakInterval) {
             clearInterval(this.breakInterval);
             this.breakInterval = null;
         }
         
-        // Notify main process
+        if (this.blurInterval) {
+            clearInterval(this.blurInterval);
+            this.blurInterval = null;
+        }
+        
+        // Notify main process and close window
         try {
             if (window.electronAPI && window.electronAPI.endBreak) {
+                this.log('Notifying main process to end break');
                 await window.electronAPI.endBreak();
-                this.log('Break ended successfully');
             } else {
-                this.log('electronAPI.endBreak not available');
+                this.log('electronAPI.endBreak not available, closing window directly');
             }
         } catch (error) {
             this.log('Error ending break:', error);
         }
+        
+        // Force close the window after a short delay
+        setTimeout(() => {
+            this.log('Force closing window');
+            if (window.close) {
+                window.close();
+            }
+        }, 100);
     }
 }
 
@@ -195,4 +265,9 @@ console.log('Available globals:', {
     electronAPI: !!window.electronAPI,
     RainAnimation: !!window.RainAnimation,
     KittenAnimation: !!window.KittenAnimation
+});
+
+// Additional safety: Listen for window beforeunload to cleanup
+window.addEventListener('beforeunload', () => {
+    console.log('Window is about to unload, performing cleanup...');
 });

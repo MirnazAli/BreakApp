@@ -7,17 +7,35 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     overflow: hidden;
     height: 100vh;
     width: 100vw;
     position: relative;
 }
 
+/* Add a subtle glass texture overlay */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
 #overlay-container {
     position: relative;
     width: 100%;
     height: 100%;
+    backdrop-filter: blur(1px);
+    transition: backdrop-filter 0.1s ease;
 }
 
 #rain-canvas {
@@ -28,6 +46,8 @@ body {
     height: 100%;
     pointer-events: none;
     z-index: 1;
+    mix-blend-mode: multiply;
+    opacity: 0.9;
 }
 
 #kitten-container {
@@ -48,6 +68,7 @@ body {
     background-size: contain;
     animation: kittenFall 3s ease-in forwards;
     z-index: 2;
+    filter: blur(0.5px);
 }
 
 @keyframes kittenFall {
@@ -72,35 +93,73 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.15);
     padding: 40px;
     border-radius: 20px;
     text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.1);
     z-index: 10;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add subtle condensation effect to the break message */
+#break-message::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    animation: condensationShift 10s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes condensationShift {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(-10px, 5px) rotate(1deg); }
+    66% { transform: translate(5px, -10px) rotate(-1deg); }
 }
 
 #break-message h1 {
     font-size: 2.5rem;
     margin-bottom: 15px;
-    color: #333;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 
+        2px 2px 4px rgba(0,0,0,0.3),
+        0 0 20px rgba(255, 255, 255, 0.5);
+    position: relative;
+    z-index: 1;
 }
 
 #break-message p {
     font-size: 1.2rem;
-    color: #666;
+    color: rgba(255, 255, 255, 0.8);
     margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 1;
 }
 
 #break-timer {
     font-size: 3rem;
     font-weight: bold;
-    color: #667eea;
+    color: rgba(255, 255, 255, 0.95);
     margin: 20px 0;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    text-shadow: 
+        2px 2px 4px rgba(0,0,0,0.3),
+        0 0 30px rgba(255, 255, 255, 0.6);
+    position: relative;
+    z-index: 1;
 }
 
 .btn {
@@ -113,73 +172,116 @@ body {
     transition: all 0.3s;
     margin: 10px;
     font-weight: 500;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1;
 }
 
 #end-break-btn {
-    background: #667eea;
+    background: rgba(102, 126, 234, 0.8);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 #end-break-btn:hover {
-    background: #5a6fd8;
+    background: rgba(90, 111, 216, 0.9);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 #force-stop-btn {
-    background: #f44336;
+    background: rgba(244, 67, 54, 0.8);
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
 }
 
 #force-stop-btn:hover {
-    background: #d32f2f;
+    background: rgba(211, 47, 47, 0.9);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+    box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
 }
 
-/* Rain drop animation */
+/* Enhanced rain drop styles for window pane effect */
 .rain-drop {
     position: absolute;
-    width: 2px;
-    height: 20px;
-    background: linear-gradient(to bottom, transparent, rgba(174, 194, 224, 0.8), transparent);
-    animation: rainFall linear infinite;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(200, 220, 255, 0.6));
+    box-shadow: 
+        inset 0 0 5px rgba(255, 255, 255, 0.5),
+        0 0 10px rgba(200, 220, 255, 0.3);
+    animation: rainDropLife 4s ease-out forwards;
 }
 
-@keyframes rainFall {
-    from {
-        transform: translateY(-100px);
+@keyframes rainDropLife {
+    0% {
+        transform: scale(0);
         opacity: 0;
     }
     10% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+    20% {
+        transform: scale(1);
         opacity: 1;
     }
-    90% {
-        opacity: 1;
+    80% {
+        transform: scale(1);
+        opacity: 0.6;
     }
-    to {
-        transform: translateY(calc(100vh + 100px));
+    100% {
+        transform: scale(0.8);
         opacity: 0;
     }
 }
 
-/* Blur effect that increases over time */
-.blur-overlay {
+/* Water streak effect */
+.water-streak {
+    position: absolute;
+    background: linear-gradient(45deg, 
+        rgba(200, 220, 255, 0.6) 0%, 
+        rgba(180, 200, 255, 0.4) 50%, 
+        rgba(160, 180, 255, 0.2) 100%);
+    border-radius: 2px;
+    animation: streakFlow 3s ease-in-out forwards;
+}
+
+@keyframes streakFlow {
+    0% {
+        transform: translateY(0) scaleY(0);
+        opacity: 0;
+    }
+    20% {
+        transform: translateY(0) scaleY(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(50px) scaleY(0.5);
+        opacity: 0;
+    }
+}
+
+/* Progressive blur effect */
+.progressive-blur {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(0px);
-    animation: increaseBlur 30s linear forwards;
+    animation: progressiveWindowBlur 60s linear forwards;
     z-index: 0;
+    pointer-events: none;
 }
 
-@keyframes increaseBlur {
-    from {
+@keyframes progressiveWindowBlur {
+    0% {
         backdrop-filter: blur(0px);
     }
-    to {
-        backdrop-filter: blur(10px);
+    50% {
+        backdrop-filter: blur(2px);
+    }
+    100% {
+        backdrop-filter: blur(4px);
     }
 }
 
@@ -187,10 +289,26 @@ body {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.6);
     color: white;
     padding: 10px 15px;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 0.9rem;
     z-index: 11;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Add subtle window frame effect */
+body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    z-index: 12;
 }
