@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain, screen, nativeImage } = require('electron');
 const path = require('path');
 const Store = require('electron-store').default;
 
@@ -48,7 +48,7 @@ function createTray() {
         }
     ]);
     
-    tray.setToolTip('Kitten Break App');
+    tray.setToolTip('Break App');
     tray.setContextMenu(contextMenu);
     
     // Show settings on double click
@@ -128,9 +128,6 @@ function createOverlayWindow() {
         console.log('Loading overlay HTML from:', overlayPath);
         
         overlay.loadFile(overlayPath);
-        
-        // Open DevTools for debugging overlay
-        overlay.webContents.openDevTools();
         
         // Log when overlay is loaded
         overlay.webContents.on('did-finish-load', () => {

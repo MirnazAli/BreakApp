@@ -4,6 +4,9 @@ class BreakApp {
         this.config = {};
         this.countdown = null;
         this.countdownInterval = null;
+        this.animation = null;
+        this.previewTimer = 10;
+        this.previewInterval = null;
         this.debug = true;
         this.init();
     }
@@ -227,12 +230,85 @@ class BreakApp {
 
     previewRain() {
         this.log('Preview rain requested');
+        
+        // Stop any existing preview
+        this.stopPreview();
+        
         this.showNotification('Rain preview - this will show rain animation during breaks');
+        
+        // Initialize rain animation
+        const rainCanvas = document.getElementById('rain-canvas');
+        if (rainCanvas && window.RainAnimation) {
+            this.animation = new RainAnimation(rainCanvas);
+            this.animation.start();
+        } else {
+            this.log('Rain animation not available');
+            this.showNotification('Rain animation not available', 'error');
+            return;
+        }
+        
+        // Start preview timer
+        this.previewTimer = 10;
+        this.previewInterval = setInterval(() => {
+            this.previewTimer--;
+            this.log('Preview timer tick:', this.previewTimer);
+            
+            if (this.previewTimer <= 0) {
+                this.log('Preview timer reached zero, stopping rain preview');
+                this.stopPreview();
+            }
+        }, 1000);
     }
 
     previewKittens() {
         this.log('Preview kittens requested');
+        
+        // Stop any existing preview
+        this.stopPreview();
+        
         this.showNotification('Kitten preview - this will show falling kittens during breaks');
+
+        // Initialize kitten animation
+        const kittenContainer = document.getElementById('kitten-container');
+        if (kittenContainer && window.KittenAnimation) {
+            this.animation = new KittenAnimation(kittenContainer);
+            this.animation.start();
+        } else {
+            this.log('Kitten animation not available');
+            this.showNotification('Kitten animation not available', 'error');
+            return;
+        }
+        
+        // Start preview timer
+        this.previewTimer = 10;
+        this.previewInterval = setInterval(() => {
+            this.previewTimer--;
+            this.log('Preview timer tick:', this.previewTimer);
+            
+            if (this.previewTimer <= 0) {
+                this.log('Preview timer reached zero, stopping kitten preview');
+                this.stopPreview();
+            }
+        }, 1000);
+    }
+
+    stopPreview() {
+        this.log('Stopping preview...');
+        
+        // Clear preview timer
+        if (this.previewInterval) {
+            clearInterval(this.previewInterval);
+            this.previewInterval = null;
+        }
+        
+        // Stop animation
+        if (this.animation) {
+            this.animation.stop();
+            this.animation = null;
+        }
+        
+        // Reset timer
+        this.previewTimer = 10;
     }
 
     showNotification(message, type = 'success') {

@@ -41,6 +41,8 @@ class RainAnimation {
         this.isRunning = false;
         if (this.dropInterval) {
             clearInterval(this.dropInterval);
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            rainCanvas.style.display = 'none';
         }
     }
     
