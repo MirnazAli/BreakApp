@@ -38,56 +38,6 @@ body::before {
     transition: backdrop-filter 0.1s ease;
 }
 
-#rain-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-    mix-blend-mode: multiply;
-    opacity: 0.9;
-}
-
-#kitten-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 2;
-}
-
-.kitten {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="%23ff9800"/><circle cx="40" cy="45" r="3" fill="%23333"/><circle cx="60" cy="45" r="3" fill="%23333"/><path d="M35 30 L40 20 L45 30 Z" fill="%23ff9800"/><path d="M55 30 L60 20 L65 30 Z" fill="%23ff9800"/><path d="M45 55 Q50 60 55 55" stroke="%23333" stroke-width="2" fill="none"/></svg>') no-repeat center;
-    background-size: contain;
-    animation: kittenFall 3s ease-in forwards;
-    z-index: 2;
-    filter: blur(0.5px);
-}
-
-@keyframes kittenFall {
-    from {
-        transform: translateY(-100px) rotate(0deg);
-    }
-    to {
-        transform: translateY(calc(100vh - 60px)) rotate(360deg);
-    }
-}
-
-.kitten:nth-child(even) {
-    animation-duration: 2.5s;
-}
-
-.kitten:nth-child(3n) {
-    animation-duration: 3.5s;
-}
-
 #break-message {
     position: absolute;
     top: 50%;
@@ -198,66 +148,6 @@ body::before {
     background: rgba(211, 47, 47, 0.9);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
-}
-
-/* Enhanced rain drop styles for window pane effect */
-.rain-drop {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(200, 220, 255, 0.6));
-    box-shadow: 
-        inset 0 0 5px rgba(255, 255, 255, 0.5),
-        0 0 10px rgba(200, 220, 255, 0.3);
-    animation: rainDropLife 4s ease-out forwards;
-}
-
-@keyframes rainDropLife {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-    10% {
-        transform: scale(1.2);
-        opacity: 0.8;
-    }
-    20% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    80% {
-        transform: scale(1);
-        opacity: 0.6;
-    }
-    100% {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-}
-
-/* Water streak effect */
-.water-streak {
-    position: absolute;
-    background: linear-gradient(45deg, 
-        rgba(200, 220, 255, 0.6) 0%, 
-        rgba(180, 200, 255, 0.4) 50%, 
-        rgba(160, 180, 255, 0.2) 100%);
-    border-radius: 2px;
-    animation: streakFlow 3s ease-in-out forwards;
-}
-
-@keyframes streakFlow {
-    0% {
-        transform: translateY(0) scaleY(0);
-        opacity: 0;
-    }
-    20% {
-        transform: translateY(0) scaleY(1);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translateY(50px) scaleY(0.5);
-        opacity: 0;
-    }
 }
 
 /* Progressive blur effect */

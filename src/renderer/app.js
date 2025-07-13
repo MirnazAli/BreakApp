@@ -60,9 +60,31 @@ class BreakApp {
             this.config = {
                 breakInterval: 25,
                 breakDuration: 5,
-                enableKittens: true,
-                enableRain: true
+                animationType: 'rain' // Changed from separate boolean flags to single animation type
             };
+        }
+        
+        // Convert legacy config if needed
+        if (typeof this.config.enableKittens !== 'undefined' || typeof this.config.enableRain !== 'undefined') {
+            this.log('Converting legacy config...');
+            if (this.config.enableKittens && !this.config.enableRain) {
+                this.config.animationType = 'kittens';
+            } else if (this.config.enableRain && !this.config.enableKittens) {
+                this.config.animationType = 'rain';
+            } else if (!this.config.enableKittens && !this.config.enableRain) {
+                this.config.animationType = 'none';
+            } else {
+                this.config.animationType = 'rain'; // Default to rain if both were enabled
+            }
+            
+            // Remove legacy properties
+            delete this.config.enableKittens;
+            delete this.config.enableRain;
+        }
+        
+        // Ensure animationType is set
+        if (!this.config.animationType) {
+            this.config.animationType = 'rain';
         }
     }
 
@@ -124,21 +146,16 @@ class BreakApp {
             });
         }
 
-        const enableRainInput = document.getElementById('enable-rain');
-        if (enableRainInput) {
-            enableRainInput.addEventListener('change', (e) => {
-                this.log('Enable rain changed to:', e.target.checked);
-                this.config.enableRain = e.target.checked;
+        // Animation radio button listeners
+        const animationRadios = document.querySelectorAll('input[name="animation"]');
+        animationRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    this.log('Animation type changed to:', e.target.value);
+                    this.config.animationType = e.target.value;
+                }
             });
-        }
-
-        const enableKittensInput = document.getElementById('enable-kittens');
-        if (enableKittensInput) {
-            enableKittensInput.addEventListener('change', (e) => {
-                this.log('Enable kittens changed to:', e.target.checked);
-                this.config.enableKittens = e.target.checked;
-            });
-        }
+        });
     }
 
     updateUI() {
@@ -146,13 +163,15 @@ class BreakApp {
         
         const breakInterval = document.getElementById('break-interval');
         const breakDuration = document.getElementById('break-duration');
-        const enableRain = document.getElementById('enable-rain');
-        const enableKittens = document.getElementById('enable-kittens');
         
         if (breakInterval) breakInterval.value = this.config.breakInterval;
         if (breakDuration) breakDuration.value = this.config.breakDuration;
-        if (enableRain) enableRain.checked = this.config.enableRain;
-        if (enableKittens) enableKittens.checked = this.config.enableKittens;
+        
+        // Update radio buttons
+        const animationRadios = document.querySelectorAll('input[name="animation"]');
+        animationRadios.forEach(radio => {
+            radio.checked = radio.value === this.config.animationType;
+        });
     }
 
     startCountdown() {

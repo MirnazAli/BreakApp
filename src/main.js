@@ -11,13 +11,34 @@ let tray = null;
 let breakTimer = null;
 let breakEndTimer = null;
 
-// App configuration
+// App configuration with updated structure
 const config = {
     breakInterval: store.get('breakInterval', 25), // minutes
     breakDuration: store.get('breakDuration', 5),   // minutes
-    enableKittens: store.get('enableKittens', true),
-    enableRain: store.get('enableRain', true)
+    animationType: store.get('animationType', 'rain') // 'rain', 'kittens', or 'none'
 };
+
+// Convert legacy config if needed
+if (store.has('enableKittens') || store.has('enableRain')) {
+    console.log('Converting legacy config...');
+    const enableKittens = store.get('enableKittens', false);
+    const enableRain = store.get('enableRain', true);
+    
+    if (enableKittens && !enableRain) {
+        config.animationType = 'kittens';
+    } else if (enableRain && !enableKittens) {
+        config.animationType = 'rain';
+    } else if (!enableKittens && !enableRain) {
+        config.animationType = 'none';
+    } else {
+        config.animationType = 'rain'; // Default to rain if both were enabled
+    }
+    
+    // Save the new config and remove old keys
+    store.set('animationType', config.animationType);
+    store.delete('enableKittens');
+    store.delete('enableRain');
+}
 
 console.log('Initial config:', config);
 
@@ -287,9 +308,7 @@ ipcMain.handle('update-config', (event, newConfig) => {
     // Save to store
     store.set('breakInterval', config.breakInterval);
     store.set('breakDuration', config.breakDuration);
-    store.set('enableKittens', config.enableKittens);
-    store.set('enableRain', config.enableRain);
-    
+    store.set('animationType', config.animationType);
     console.log('Config saved:', config);
     
     // Reschedule if interval changed

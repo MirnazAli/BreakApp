@@ -70,9 +70,27 @@ class BreakOverlay {
             this.log('Error loading config, using defaults:', error);
             this.config = {
                 breakDuration: 5,
-                enableKittens: true,
-                enableRain: true
+                animationType: 'rain' // Changed from separate boolean flags
             };
+        }
+        
+        // Convert legacy config if needed
+        if (typeof this.config.enableKittens !== 'undefined' || typeof this.config.enableRain !== 'undefined') {
+            this.log('Converting legacy config...');
+            if (this.config.enableKittens && !this.config.enableRain) {
+                this.config.animationType = 'kittens';
+            } else if (this.config.enableRain && !this.config.enableKittens) {
+                this.config.animationType = 'rain';
+            } else if (!this.config.enableKittens && !this.config.enableRain) {
+                this.config.animationType = 'none';
+            } else {
+                this.config.animationType = 'rain'; // Default to rain if both were enabled
+            }
+        }
+        
+        // Ensure animationType is set
+        if (!this.config.animationType) {
+            this.config.animationType = 'rain';
         }
     }
     
@@ -134,17 +152,38 @@ class BreakOverlay {
     }
     
     startBreak() {
-        this.log('Starting break...');
+        this.log('Starting break with animation type:', this.config.animationType);
         
-        // Start animations if enabled
-        if (this.config.enableRain && this.rainAnimation) {
-            this.log('Starting rain animation');
-            this.rainAnimation.start();
-        }
-        
-        if (this.config.enableKittens && this.kittenAnimation) {
-            this.log('Starting kitten animation');
-            this.kittenAnimation.start();
+        // Start the selected animation
+        switch (this.config.animationType) {
+            case 'rain':
+                if (this.rainAnimation) {
+                    this.log('Starting rain animation');
+                    this.rainAnimation.start();
+                } else {
+                    this.log('Rain animation not available');
+                }
+                break;
+                
+            case 'kittens':
+                if (this.kittenAnimation) {
+                    this.log('Starting kitten animation');
+                    this.kittenAnimation.start();
+                } else {
+                    this.log('Kitten animation not available');
+                }
+                break;
+                
+            case 'none':
+                this.log('No animation selected');
+                break;
+                
+            default:
+                this.log('Unknown animation type, defaulting to rain');
+                if (this.rainAnimation) {
+                    this.rainAnimation.start();
+                }
+                break;
         }
         
         // Start progressive blur effect
@@ -210,7 +249,7 @@ class BreakOverlay {
         }
         this.isEnding = true;
         
-        // Stop animations immediately
+        // Stop all animations
         if (this.rainAnimation) {
             this.log('Stopping rain animation');
             this.rainAnimation.stop();

@@ -1,0 +1,72 @@
+/* Rain Animation Styles */
+#rain-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: multiply;
+    opacity: 0.9;
+}
+
+/* Enhanced rain drop styles for window pane effect */
+.rain-drop {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(200, 220, 255, 0.6));
+    box-shadow: 
+        inset 0 0 5px rgba(255, 255, 255, 0.5),
+        0 0 10px rgba(200, 220, 255, 0.3);
+    animation: rainDropLife 4s ease-out forwards;
+}
+
+@keyframes rainDropLife {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    10% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+    20% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    80% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+}
+
+/* Water streak effect */
+.water-streak {
+    position: absolute;
+    background: linear-gradient(45deg, 
+        rgba(200, 220, 255, 0.6) 0%, 
+        rgba(180, 200, 255, 0.4) 50%, 
+        rgba(160, 180, 255, 0.2) 100%);
+    border-radius: 2px;
+    animation: streakFlow 3s ease-in-out forwards;
+}
+
+@keyframes streakFlow {
+    0% {
+        transform: translateY(0) scaleY(0);
+        opacity: 0;
+    }
+    20% {
+        transform: translateY(0) scaleY(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(50px) scaleY(0.5);
+        opacity: 0;
+    }
+}

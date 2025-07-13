@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitten Break App</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Animation-specific CSS files for previews -->
+    <link rel="stylesheet" href="animations/rain.css">
+    <link rel="stylesheet" href="animations/kittens.css">
 </head>
 <body>
     <div class="container">
-        <!-- Rain animation canvas -->
+        <!-- Animation containers for previews -->
         <canvas id="rain-canvas"></canvas>
-        
-        <!-- Kitten container -->
         <div id="kitten-container"></div>
 
         <header>
@@ -42,17 +43,21 @@
                 </div>
 
                 <div class="setting-group">
-                    <label>
-                        <input type="checkbox" id="enable-rain" checked>
-                        Enable Rain Animation
-                    </label>
-                </div>
-
-                <div class="setting-group">
-                    <label>
-                        <input type="checkbox" id="enable-kittens" checked>
-                        Enable Kitten Spawning
-                    </label>
+                    <label>Animation Style:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" id="animation-rain" name="animation" value="rain" checked>
+                            <span class="radio-text">Rain Animation</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" id="animation-kittens" name="animation" value="kittens">
+                            <span class="radio-text">Kitten Spawning</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" id="animation-none" name="animation" value="none">
+                            <span class="radio-text">No Animation</span>
+                        </label>
+                    </div>
                 </div>
 
                 <button id="save-settings-btn" class="btn secondary">Save Settings</button>
