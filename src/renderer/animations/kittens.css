@@ -1,4 +1,4 @@
-/* Kitten Animation Styles */
+/* Kitten Animation Styles - Cursor-based Spawning */
 #kitten-container {
     position: absolute;
     top: 0;
@@ -7,49 +7,99 @@
     height: 100%;
     pointer-events: none;
     z-index: 2;
+    overflow: hidden;
 }
 
 .kitten {
     position: absolute;
-    width: 60px;
-    height: 60px;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="%23ff9800"/><circle cx="40" cy="45" r="3" fill="%23333"/><circle cx="60" cy="45" r="3" fill="%23333"/><path d="M35 30 L40 20 L45 30 Z" fill="%23ff9800"/><path d="M55 30 L60 20 L65 30 Z" fill="%23ff9800"/><path d="M45 55 Q50 60 55 55" stroke="%23333" stroke-width="2" fill="none"/></svg>') no-repeat center;
+    width: 50px;
+    height: 50px;
     background-size: contain;
-    animation: kittenFall 3s ease-in forwards;
-    z-index: 2;
-    filter: blur(0.5px);
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 3;
+    pointer-events: none;
 }
 
-@keyframes kittenFall {
-    from {
-        transform: translateY(-100px) rotate(0deg);
+.kitten.cursor-spawn {
+    animation: none
+}
+
+/* Kitten hover effect when cursor is near */
+.kitten:hover {
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 235, 59, 0.6));
+    transform: scale(1.1);
+    transition: all 0.2s ease;
+}
+
+/* Add a subtle glow effect to kittens */
+.kitten {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 8px rgba(255, 235, 59, 0.3));
+}
+
+/* Sparkle effect styling */
+.sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffeb3b 0%, #ff9800 100%);
+    pointer-events: none;
+    z-index: 5;
+    box-shadow: 0 0 6px #ffeb3b;
+}
+
+/* Cursor trail effect */
+body {
+    cursor: none; /* Hide default cursor */
+}
+
+/* Custom cursor */
+body::before {
+    display: none
+}
+
+#custom-cursor {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    font-size: 20px;
+    transform: translate(-50%, -50%);
+    animation: cursorPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes cursorPulse {
+    from { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    to { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+}
+
+/* Responsive kitten sizes */
+@media (max-width: 768px) {
+    .kitten {
+        width: 40px;
+        height: 40px;
     }
-    to {
-        transform: translateY(calc(100vh - 60px)) rotate(360deg);
+}
+
+@media (max-width: 480px) {
+    .kitten {
+        width: 35px;
+        height: 35px;
     }
 }
 
-.kitten:nth-child(even) {
-    animation-duration: 2.5s;
+/* Performance optimizations */
+.kitten {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
 }
 
-.kitten:nth-child(3n) {
-    animation-duration: 3.5s;
+/* Add a subtle particle system background */
+#kitten-container::before {
+    display: none;
 }
 
-/* Kitten variations */
-.kitten.orange {
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="%23ff9800"/><circle cx="40" cy="45" r="3" fill="%23333"/><circle cx="60" cy="45" r="3" fill="%23333"/><path d="M35 30 L40 20 L45 30 Z" fill="%23ff9800"/><path d="M55 30 L60 20 L65 30 Z" fill="%23ff9800"/><path d="M45 55 Q50 60 55 55" stroke="%23333" stroke-width="2" fill="none"/></svg>') no-repeat center;
-}
-
-.kitten.gray {
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="%23757575"/><circle cx="40" cy="45" r="3" fill="%23333"/><circle cx="60" cy="45" r="3" fill="%23333"/><path d="M35 30 L40 20 L45 30 Z" fill="%23757575"/><path d="M55 30 L60 20 L65 30 Z" fill="%23757575"/><path d="M45 55 Q50 60 55 55" stroke="%23333" stroke-width="2" fill="none"/></svg>') no-repeat center;
-}
-
-.kitten.black {
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="%23424242"/><circle cx="40" cy="45" r="3" fill="%23FFF"/><circle cx="60" cy="45" r="3" fill="%23FFF"/><path d="M35 30 L40 20 L45 30 Z" fill="%23424242"/><path d="M55 30 L60 20 L65 30 Z" fill="%23424242"/><path d="M45 55 Q50 60 55 55" stroke="%23FFF" stroke-width="2" fill="none"/></svg>') no-repeat center;
-}
-
-.kitten.white {
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="%23FAFAFA"/><circle cx="40" cy="45" r="3" fill="%23333"/><circle cx="60" cy="45" r="3" fill="%23333"/><path d="M35 30 L40 20 L45 30 Z" fill="%23FAFAFA"/><path d="M55 30 L60 20 L65 30 Z" fill="%23FAFAFA"/><path d="M45 55 Q50 60 55 55" stroke="%23333" stroke-width="2" fill="none"/></svg>') no-repeat center;
+@keyframes sparkleBackground {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-200px, -100px); }
 }

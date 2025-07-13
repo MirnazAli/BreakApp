@@ -24,6 +24,9 @@ class BreakOverlay {
         // Load configuration
         await this.loadConfig();
         
+        // Load selected animation
+        await this.loadAnimation();
+
         // Set up blur overlay
         this.setupBlurOverlay();
         
@@ -93,24 +96,59 @@ class BreakOverlay {
             this.config.animationType = 'rain';
         }
     }
+
+    async loadAnimation() {
+        this.log('Loading animation:', this.config.animationType);
+        
+        if (this.config.animationType === 'none') {
+            return;
+        }
+
+        try {
+            // Dynamically load CSS
+            const cssLink = document.createElement('link');
+            cssLink.rel = 'stylesheet';
+            cssLink.href = `animations/${this.config.animationType}.css`;
+            document.head.appendChild(cssLink);
+
+            // Dynamically load JS
+            const script = document.createElement('script');
+            script.src = `animations/${this.config.animationType}.js`;
+            await new Promise((resolve) => {
+                script.onload = resolve;
+                document.head.appendChild(script);
+            });
+
+            // Create animation container
+            const container = document.createElement(this.config.animationType === 'rain' ? 'canvas' : 'div');
+            container.id = this.config.animationType === 'rain' ? 'rain-canvas' : 'kitten-container';
+            document.getElementById('overlay-container').prepend(container);
+            
+            this.log('Animation loaded successfully');
+        } catch (error) {
+            this.log('Error loading animation:', error);
+        }
+    }
+
     
     setupAnimations() {
         this.log('Setting up animations...');
         
-        // Initialize rain animation
-        const rainCanvas = document.getElementById('rain-canvas');
-        if (rainCanvas && window.RainAnimation) {
-            this.rainAnimation = new RainAnimation(rainCanvas);
-        } else {
-            this.log('Rain animation not available');
-        }
-        
-        // Initialize kitten animation
-        const kittenContainer = document.getElementById('kitten-container');
-        if (kittenContainer && window.KittenAnimation) {
-            this.kittenAnimation = new KittenAnimation(kittenContainer);
-        } else {
-            this.log('Kitten animation not available');
+        // Initialize only the selected animation
+        switch (this.config.animationType) {
+            case 'rain':
+                const rainCanvas = document.getElementById('rain-canvas');
+                if (rainCanvas && window.RainAnimation) {
+                    this.rainAnimation = new RainAnimation(rainCanvas);
+                }
+                break;
+                
+            case 'kittens':
+                const kittenContainer = document.getElementById('kitten-container');
+                if (kittenContainer && window.KittenAnimation) {
+                    this.kittenAnimation = new KittenAnimation(kittenContainer);
+                }
+                break;
         }
     }
     
@@ -291,6 +329,8 @@ class BreakOverlay {
             }
         }, 100);
     }
+
+
 }
 
 // Initialize overlay when DOM is loaded
