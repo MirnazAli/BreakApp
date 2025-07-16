@@ -31,6 +31,9 @@ class BreakApp {
             // Set up event listeners
             this.setupEventListeners();
             
+            // Set up break end listener
+            this.setupBreakEndListener();
+            
             // Update UI with current config
             this.updateUI();
             
@@ -85,6 +88,32 @@ class BreakApp {
         // Ensure animationType is set
         if (!this.config.animationType) {
             this.config.animationType = 'rain';
+        }
+    }
+
+    async loadAnimationResources(type) {
+        this.log(`Loading ${type} animation resources...`);
+        
+        try {
+            // Load CSS
+            const cssLink = document.createElement('link');
+            cssLink.rel = 'stylesheet';
+            cssLink.href = `animations/${type}.css`;
+            document.head.appendChild(cssLink);
+            
+            // Load JS
+            const script = document.createElement('script');
+            script.src = `animations/${type}.js`;
+            await new Promise((resolve) => {
+                script.onload = resolve;
+                document.head.appendChild(script);
+            });
+            
+            this.log(`${type} animation resources loaded successfully`);
+            return true;
+        } catch (error) {
+            this.log(`Error loading ${type} animation resources:`, error);
+            return false;
         }
     }
 
@@ -146,6 +175,14 @@ class BreakApp {
             });
         }
 
+        // ESC key to close preview
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.animation) {
+                this.log('ESC pressed during preview');
+                this.stopPreview();
+            }
+        });
+
         // Animation radio button listeners
         const animationRadios = document.querySelectorAll('input[name="animation"]');
         animationRadios.forEach(radio => {
@@ -156,6 +193,15 @@ class BreakApp {
                 }
             });
         });
+    }
+
+    setupBreakEndListener() {
+        if (window.electronAPI && window.electronAPI.onBreakEnded) {
+            window.electronAPI.onBreakEnded(() => {
+                this.log('Break ended event received');
+                this.restartCountdown();
+            });
+        }
     }
 
     updateUI() {
@@ -219,7 +265,6 @@ class BreakApp {
         try {
             if (window.electronAPI && window.electronAPI.triggerBreak) {
                 await window.electronAPI.triggerBreak();
-                this.restartCountdown();
                 this.showNotification('Break started!');
             } else {
                 throw new Error('electronAPI.triggerBreak not available');
@@ -246,66 +291,75 @@ class BreakApp {
             this.showNotification('Error saving settings', 'error');
         }
     }
-
-    previewRain() {
+    
+    async previewRain() {
         this.log('Preview rain requested');
-        
-        // Stop any existing preview
         this.stopPreview();
         
-        this.showNotification('Rain preview - this will show rain animation during breaks');
-        
-        // Initialize rain animation
-        const rainCanvas = document.getElementById('rain-canvas');
-        if (rainCanvas && window.RainAnimation) {
-            this.animation = new RainAnimation(rainCanvas);
-            this.animation.start();
-        } else {
-            this.log('Rain animation not available');
-            this.showNotification('Rain animation not available', 'error');
-            return;
+        // Load resources if needed
+        if (typeof window.RainAnimation === 'undefined') {
+            const loaded = await this.loadAnimationResources('rain');
+            if (!loaded) {
+                this.showNotification('Failed to load rain animation', 'error');
+                return;
+            }
         }
         
-        // Start preview timer
-        this.previewTimer = 10;
-        this.previewInterval = setInterval(() => {
-            this.previewTimer--;
-            this.log('Preview timer tick:', this.previewTimer);
-            
-            if (this.previewTimer <= 0) {
-                this.log('Preview timer reached zero, stopping rain preview');
-                this.stopPreview();
-            }
-        }, 1000);
+        // Create preview container
+        const container = document.createElement('canvas');
+        container.id = 'preview-rain-canvas';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        document.getElementById('preview-overlay').appendChild(container);
+        document.getElementById('preview-overlay').style.display = 'block';
+        
+        // Initialize animation
+        this.animation = new window.RainAnimation(container);
+        this.animation.start();
+        
+        this.showNotification('Rain preview - press ESC to close');
+        this.startPreviewTimer();
+        document.body.style.cursor = 'default'; // Keep default cursor
     }
 
-    previewKittens() {
+    async previewKittens() {
         this.log('Preview kittens requested');
-        
-        // Stop any existing preview
         this.stopPreview();
         
-        this.showNotification('Kitten preview - this will show falling kittens during breaks');
-
-        // Initialize kitten animation
-        const kittenContainer = document.getElementById('kitten-container');
-        if (kittenContainer && window.KittenAnimation) {
-            this.animation = new KittenAnimation(kittenContainer);
-            this.animation.start();
-        } else {
-            this.log('Kitten animation not available');
-            this.showNotification('Kitten animation not available', 'error');
-            return;
+        // Load resources if needed
+        if (typeof window.KittenAnimation === 'undefined') {
+            const loaded = await this.loadAnimationResources('kittens');
+            if (!loaded) {
+                this.showNotification('Failed to load kitten animation', 'error');
+                return;
+            }
         }
         
-        // Start preview timer
+        // Create preview container
+        const container = document.createElement('div');
+        container.id = 'preview-kitten-container';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        document.getElementById('preview-overlay').appendChild(container);
+        document.getElementById('preview-overlay').style.display = 'block';
+        
+        // Initialize animation
+        this.animation = new window.KittenAnimation(container);
+        this.animation.start();
+        
+        this.showNotification('Kitten preview - press ESC to close');
+        this.startPreviewTimer();
+        document.body.style.cursor = 'none'; // Hide cursor for kitten preview
+    }
+
+    
+    startPreviewTimer() {
         this.previewTimer = 10;
         this.previewInterval = setInterval(() => {
             this.previewTimer--;
             this.log('Preview timer tick:', this.previewTimer);
             
             if (this.previewTimer <= 0) {
-                this.log('Preview timer reached zero, stopping kitten preview');
                 this.stopPreview();
             }
         }, 1000);
@@ -325,6 +379,16 @@ class BreakApp {
             this.animation.stop();
             this.animation = null;
         }
+        
+        // Clear preview container
+        const previewOverlay = document.getElementById('preview-overlay');
+        previewOverlay.style.display = 'none';
+        while (previewOverlay.firstChild) {
+            previewOverlay.removeChild(previewOverlay.firstChild);
+        }
+        
+        // Restore cursor visibility
+        document.body.style.cursor = 'default';
         
         // Reset timer
         this.previewTimer = 10;

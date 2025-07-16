@@ -228,7 +228,13 @@ function endBreakMode() {
     });
     
     console.log('All overlay windows closed, scheduling next break');
-    scheduleNextBreak();
+    
+    // Notify renderer process that break ended
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('break-ended');
+    }
+    
+    scheduleNextBreak();  // Schedule the next break
 }
 
 function scheduleNextBreak() {
@@ -334,6 +340,17 @@ ipcMain.handle('end-break', () => {
 // Add debugging IPC
 ipcMain.handle('debug-log', (event, message) => {
     console.log('Renderer log:', message);
+});
+
+// Add this to your main process code
+ipcMain.on('end-break', () => {
+    // Notify renderer process that break ended
+    mainWindow.webContents.send('break-ended');
+});
+
+// Expose the break-ended event to renderer
+ipcMain.handle('on-break-ended', (event) => {
+    // Setup listener in renderer
 });
 
 console.log('Main process initialized');
